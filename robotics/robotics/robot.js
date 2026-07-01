@@ -1,3 +1,14 @@
+/**
+ * @file robot.js
+ * @brief Decoupled 2-Stage Self-Correction Algorithm Simulation for Robotic Arms
+ * @copyright Copyright (C) 2026 Zong Ming Yang. All Rights Reserved.
+ * @license GNU Affero General Public License v3.0 (AGPL-3.0)
+ * * Reference Paper: 
+ * "How basic Trigonometric modeling can help predict robotic arm self-correction angle 
+ * in microgravity when human input is impaired" - Zong Ming Yang, Jose Salinas (2026).
+ */
+
+
 console.log("🌟 Dynamic Decoupled Solver: Replicating JEI Essay Methodology Perfect Alignment.");
 
 const canvas = document.getElementById('armCanvas');
