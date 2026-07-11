@@ -9,17 +9,16 @@
  */
 
 
-console.log("🌟 Dynamic Decoupled Solver: Replicating JEI Essay Methodology Perfect Alignment.");
+console.log(" Dynamic Decoupled Solver: Replicating JEI Essay Methodology Perfect Alignment.");
 
 const canvas = document.getElementById('armCanvas');
 const ctx = canvas.getContext('2d');
 
-// --- Layout & Work Space Calibration ---
-const SCALE = 55;                 // Visual scale multiplier
-const base = { x: 450, y: 400 };  // Adjusted Center Base O (0,0) to accommodate wider range
-const L1 = 5 * SCALE;             // Main arm link 1 length = 5 units
-const L2 = 5 * SCALE;             // Forearm link 2 length = 5 units
 
+const SCALE = 55;                 
+const base = { x: 450, y: 400 };  
+const L1 = 5 * SCALE;             
+const L2 = 5 * SCALE;             
 let jointF = { x: 0, y: 0 };     
 let endE = { x: 0, y: 0 };       
 let targetT = { x: 0, y: 0 };    
@@ -27,17 +26,17 @@ let ptC = { x: 0, y: 0 };
 let ptD = { x: 0, y: 0 }; 
 let chosenIntersection = { x: 0, y: 0 };
 
-// --- Decoupled Kinematic State Machine ---
+
 let currentAngles = { t1: 0, t2: 0 };
 let startAngles = { t1: 0, t2: 0 };
 let phase1Angles = { t1: 0, t2: 0 }; 
 let phase2Angles = { t1: 0, t2: 0 }; 
 
 let animTimer = 0;
-let currentPhase = 0;             // 0: Idle, 1: Phase I (Forearm correction), 2: Phase II (Base sweep)
-const ANIM_SPEED = 0.0015;        // Slowed down drastically for granular tracking
+let currentPhase = 0;            
+const ANIM_SPEED = 0.0015;        
 
-// [Essay Sect 3.2]: Find intersection of Circle C1 (Centered at F) and Circle C4 (Centered at O)
+
 function getIntersections(fx, fy, r1, bx, by, r4) {
     const dx = bx - fx;
     const dy = by - fy;
@@ -53,7 +52,7 @@ function getIntersections(fx, fy, r1, bx, by, r4) {
     };
 }
 
-// [Essay Formula 80]: Vector Dot Product Inverse Cosine Angle Calculator
+
 function calculateCorrectionAngle(v1, v2) {
     const dotProduct = v1.x * v2.x + v1.y * v2.y;
     const mag1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y);
@@ -81,16 +80,16 @@ function toDegrees(rad) {
 }
 
 function generateRandomScenario() {
-    // Generate Target T within valid operational reach boundaries [2.5 to 8.5]
+    
     const tAngle = Math.random() * Math.PI * 2;
     const tDist = (2.5 + Math.random() * 5.5) * SCALE; 
     targetT = { x: base.x + tDist * Math.cos(tAngle), y: base.y + tDist * Math.sin(tAngle) };
 
-    // Create random astronaut-induced structural operational deviation
+   
     startAngles.t1 = Math.random() * Math.PI * 2;
     startAngles.t2 = (Math.random() * 2 - 1) * (Math.PI * 0.4);
 
-    // Dynamic initial geometry setup
+   
     jointF.x = base.x + L1 * Math.cos(startAngles.t1);
     jointF.y = base.y + L1 * Math.sin(startAngles.t1);
     endE.x = jointF.x + L2 * Math.cos(startAngles.t1 + startAngles.t2);
@@ -103,13 +102,13 @@ function generateRandomScenario() {
         ptC = intersections.C;
         ptD = intersections.D;
 
-        // Choose optimal intersection path minimizing displacement
+        
         const distC = Math.sqrt((endE.x - ptC.x)**2 + (endE.y - ptC.y)**2);
         const distD = Math.sqrt((endE.x - ptD.x)**2 + (endE.y - ptD.y)**2);
         const bestPt = distC < distD ? ptC : ptD;
         chosenIntersection = bestPt;
 
-        // --- DECOUPLED STAGE 1: Forearm Alignment (Vector FE to FC) ---
+       
         const vec_FE = { x: endE.x - jointF.x, y: endE.y - jointF.y };
         const vec_FC = { x: bestPt.x - jointF.x, y: bestPt.y - jointF.y };
         const alpha = calculateCorrectionAngle(vec_FE, vec_FC);
@@ -117,7 +116,7 @@ function generateRandomScenario() {
         phase1Angles.t1 = startAngles.t1;
         phase1Angles.t2 = startAngles.t2 + alpha; 
 
-        // --- DECOUPLED STAGE 2: Whole Arm Rigid Sweep ---
+       
         const tempJointF = { x: base.x + L1 * Math.cos(phase1Angles.t1), y: base.y + L1 * Math.sin(phase1Angles.t1) };
         const tempEndE = { x: tempJointF.x + L2 * Math.cos(phase1Angles.t1 + phase1Angles.t2), y: tempJointF.y + L2 * Math.sin(phase1Angles.t1 + phase1Angles.t2) };
         
@@ -128,7 +127,7 @@ function generateRandomScenario() {
         phase2Angles.t1 = phase1Angles.t1 + beta; 
         phase2Angles.t2 = phase1Angles.t2; 
 
-        // Initializing clock parameters
+        
         currentAngles.t1 = startAngles.t1;
         currentAngles.t2 = startAngles.t2;
         currentPhase = 1;
@@ -141,7 +140,6 @@ function generateRandomScenario() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // --- State Handler and Separated Interpolation Engine ---
     if (currentPhase === 1) { 
         animTimer += ANIM_SPEED;
         if (animTimer >= 1.0) { animTimer = 0; currentPhase = 2; }
@@ -154,31 +152,27 @@ function draw() {
         currentAngles.t2 = phase1Angles.t2;
     }
 
-    // Kinematic forward projection to canvas mapping
     jointF.x = base.x + L1 * Math.cos(currentAngles.t1);
     jointF.y = base.y + L1 * Math.sin(currentAngles.t1);
     endE.x = jointF.x + L2 * Math.cos(currentAngles.t1 + currentAngles.t2);
     endE.y = jointF.y + L2 * Math.sin(currentAngles.t1 + currentAngles.t2);
 
-    // =======================================================
-    // 🎨 VISUAL LAYER 1: ESSAY BACKGROUND GEOMETRY SCHEMATICS
-    // =======================================================
     
-    // Circle C3: Maximum reachable envelope
+    
     ctx.beginPath(); ctx.arc(base.x, base.y, L1 + L2, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(244, 67, 54, 0.15)'; ctx.lineWidth = 1; ctx.stroke();
     ctx.fillStyle = 'rgba(244,67,54,0.005)'; ctx.fill();
 
-    // Circle C4: Target range circle trajectory
+    
     const r4 = Math.sqrt((targetT.x - base.x)**2 + (targetT.y - base.y)**2);
     ctx.beginPath(); ctx.arc(base.x, base.y, r4, 0, Math.PI * 2);
     ctx.strokeStyle = '#4caf50'; ctx.lineWidth = 1.5; ctx.stroke();
 
-    // Circle C1: Segment workspace centered at Joint F
+    
     ctx.beginPath(); ctx.arc(jointF.x, jointF.y, L2, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(156, 39, 176, 0.2)'; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
 
-    // Plotting Intersection Intercepts C and D
+    
     if (currentPhase > 0) {
         ctx.fillStyle = '#ff9800'; ctx.font = 'bold 11px Courier New';
         ctx.beginPath(); ctx.arc(ptC.x, ptC.y, 5, 0, Math.PI*2); ctx.fill();
@@ -186,36 +180,32 @@ function draw() {
         ctx.beginPath(); ctx.arc(ptD.x, ptD.y, 5, 0, Math.PI*2); ctx.fill();
         ctx.fillText("D (Intersection)", ptD.x + 10, ptD.y + 12);
 
-        // Reference Line P1 (Origin to Target T)
+       
         ctx.beginPath(); ctx.moveTo(base.x, base.y); ctx.lineTo(targetT.x, targetT.y);
         ctx.strokeStyle = '#e91e63'; ctx.setLineDash([5, 5]); ctx.lineWidth = 1.2; ctx.stroke(); ctx.setLineDash([]);
         ctx.fillStyle = '#e91e63'; ctx.fillText("P1 Ref", (base.x + targetT.x)/2 - 15, (base.y + targetT.y)/2 - 10);
     }
 
-    // Vector Deviation Indicator (E -> T)
+  
     ctx.beginPath(); ctx.moveTo(endE.x, endE.y); ctx.lineTo(targetT.x, targetT.y);
     ctx.strokeStyle = 'rgba(255, 235, 59, 0.4)'; ctx.lineWidth = 1; ctx.stroke();
 
-    // =======================================================
-    // 🦾 VISUAL LAYER 2: PHYSICAL MANIPULATOR MECHANICAL LINKS
-    // =======================================================
     
-    // Main Arm Segment (L1)
     ctx.beginPath(); ctx.moveTo(base.x, base.y); ctx.lineTo(jointF.x, jointF.y);
     ctx.strokeStyle = '#3f51b5'; ctx.lineWidth = 11; ctx.lineCap = 'round'; ctx.stroke();
 
-    // Forearm Segment (L2)
+    
     ctx.beginPath(); ctx.moveTo(jointF.x, jointF.y); ctx.lineTo(endE.x, endE.y);
     ctx.strokeStyle = '#009688'; ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.stroke();
 
-    // Joint Angular Hinge Arc Overlays
+   
     ctx.beginPath(); ctx.arc(base.x, base.y, 35, 0, currentAngles.t1, currentAngles.t1 < 0);
     ctx.strokeStyle = 'rgba(63, 81, 181, 0.6)'; ctx.lineWidth = 2; ctx.stroke();
 
     ctx.beginPath(); ctx.arc(jointF.x, jointF.y, 25, currentAngles.t1, currentAngles.t1 + currentAngles.t2, currentAngles.t2 < 0);
     ctx.strokeStyle = 'rgba(0, 150, 136, 0.8)'; ctx.lineWidth = 2; ctx.stroke();
 
-    // Core Nodes
+  
     ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(base.x, base.y, 8, 0, Math.PI * 2); ctx.fill(); 
     ctx.font = 'bold 12px Arial'; ctx.fillText("O (Base)", base.x - 55, base.y + 22);
     
@@ -228,16 +218,12 @@ function draw() {
     ctx.fillStyle = '#e91e63'; ctx.beginPath(); ctx.arc(targetT.x, targetT.y, 8, 0, Math.PI * 2); ctx.fill(); 
     ctx.fillText("T (Target)", targetT.x + 12, targetT.y + 4);
 
-    // =======================================================
-    // 📊 VISUAL LAYER 3: NON-OVERLAPPING ANALYTICS IN PANEL (English)
-    // =======================================================
-    // Moved completely to bottom-left corner to keep workspace clear
     const panY = 640; 
     ctx.fillStyle = 'rgba(15, 15, 18, 0.9)'; ctx.fillRect(15, panY, 360, 245);
     ctx.strokeStyle = '#33333d'; ctx.lineWidth = 1.5; ctx.strokeRect(15, panY, 360, 245);
 
     ctx.fillStyle = '#00e5ff'; ctx.font = 'bold 12px sans-serif';
-    ctx.fillText("📊 DECOUPLED MATHEMATICAL FRAMEWORK", 30, panY + 25);
+    ctx.fillText(" DECOUPLED MATHEMATICAL FRAMEWORK", 30, panY + 25);
     ctx.fillStyle = '#2d2d35'; ctx.fillRect(30, panY + 35, 330, 1);
 
     ctx.fillStyle = '#eceff1'; ctx.font = '11px monospace';
